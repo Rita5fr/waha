@@ -61,6 +61,7 @@ import {
   ToGroupV2UpdateEvent,
 } from '@waha/core/engines/noweb/groups.noweb';
 import { sendButtonMessage } from '@waha/core/engines/noweb/noweb.buttons';
+import { sendQuizPoll } from '@waha/core/engines/noweb/noweb.quiz';
 import {
   NOWEBNewsletterMetadata,
   toNewsletterMetadata,
@@ -1239,6 +1240,22 @@ export class WhatsappSessionNoWebCore extends WhatsappSession {
   @Activity()
   async sendPoll(request: MessagePollRequest) {
     const requestPoll = request.poll;
+    if (requestPoll.correctAnswer) {
+      const quizJid = await this.hooks.wid.chat.promise(
+        request.chatId,
+        'sendPoll',
+      );
+      const quizOptions = await this.getMessageOptions(request);
+      const quiz = await sendQuizPoll(
+        this.sock,
+        quizJid,
+        requestPoll.name,
+        requestPoll.options,
+        requestPoll.correctAnswer,
+        quizOptions.messageId,
+      );
+      return await this.toWAMessage(quiz);
+    }
     const poll = {
       name: requestPoll.name,
       values: requestPoll.options,

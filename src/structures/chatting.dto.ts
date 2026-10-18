@@ -464,6 +464,17 @@ export class MessagePoll {
   @IsOptional()
   @IsBoolean()
   multipleAnswers = false;
+
+  @ApiProperty({
+    description:
+      'Makes the poll a quiz: the right option, one of "options". Voters see at once whether they were right. NOWEB, channels only.',
+    example: null,
+    required: false,
+  })
+  @IsOptional()
+  @Transform(TrimString)
+  @IsString()
+  correctAnswer?: string;
 }
 
 export class MessagePollRequest extends ChatRequest {
